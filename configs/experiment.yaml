@@ -1,0 +1,100 @@
+schema_version: 1
+experiment_id: hnswlib-sharding-10m-v1
+
+software:
+  python: "3.10"
+  hnswlib: "0.8.0"
+  numpy: "1.26.4"
+
+seeds:
+  partition_seed: 20260829
+  hnsw_random_seed: 100
+  query_order_seed: 20260830
+  bootstrap_seed: 20260831
+
+datasets:
+  sift10m:
+    base_path: data/sift10m/raw/base.10M.u8bin
+    query_path: data/sift10m/raw/query.public.10K.u8bin
+    ground_truth_path: data/sift10m/raw/groundtruth.public.10K.ibin
+    manifest_path: data/sift10m/manifest.json
+    count: 10000000
+    dimension: 128
+    query_count: 10000
+    source_dtype: uint8
+    dtype: float32
+    space: l2
+    metric_confirmation_required: false
+
+  cohere10m:
+    base_path: data/cohere10m/raw/base.10M.fbin
+    query_path: data/cohere10m/raw/wikipedia_query.bin
+    ground_truth_path: data/cohere10m/raw/wikipedia-10M
+    manifest_path: data/cohere10m/manifest.json
+    count: 10000000
+    dimension: 768
+    query_count: 5000
+    source_dtype: float32
+    dtype: float32
+    space: ip
+    metric_confirmation_required: false
+
+topologies:
+  - id: 1x10m
+    shard_count: 1
+    expected_shard_size: 10000000
+  - id: 2x5m
+    shard_count: 2
+    expected_shard_size: 5000000
+  - id: 5x2m
+    shard_count: 5
+    expected_shard_size: 2000000
+
+build_profiles:
+  baseline:
+    M: 16
+    ef_construction: 200
+    random_seed: 100
+    add_items_threads: 16
+    add_items_batch_size: 100000
+  extended:
+    M: 32
+    ef_construction: 400
+    random_seed: 100
+    add_items_threads: 16
+    add_items_batch_size: 100000
+    enabled_after_capacity_review: true
+
+search:
+  ef_search_values: [100, 200, 400, 800]
+  k_values: [10, 100]
+  num_threads: 1
+  shard_execution: sequential
+  warmup_queries: 1000
+  measured_queries: 10000
+  repetitions: 5
+  topology_execution_order: [1x10m, 2x5m, 5x2m]
+  required_environment:
+    OMP_NUM_THREADS: "1"
+    OPENBLAS_NUM_THREADS: "1"
+    MKL_NUM_THREADS: "1"
+    NUMEXPR_NUM_THREADS: "1"
+
+ground_truth:
+  max_k: 100
+  exact_validation_query_count: 100
+  base_block_rows: 100000
+  tie_break: [distance, global_label]
+
+analysis:
+  latency_percentiles: [50, 95, 99]
+  bootstrap_resamples: 10000
+  confidence_level: 0.95
+  primary_latency: end_to_end_ns
+  primary_recall: recall_at_k
+
+paths:
+  indexes: indexes
+  logs: logs
+  raw_results: results/raw
+  summary_results: results/summary

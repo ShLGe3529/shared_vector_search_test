@@ -1,0 +1,8 @@
+# Pin these versions for the v1 experiment. Changing any pin requires a new
+# experiment ID and rebuilding every compared topology.
+hnswlib==0.8.0
+numpy==1.26.4
+PyYAML==6.0.2
+psutil==6.1.1
+pytest==8.3.4
+
