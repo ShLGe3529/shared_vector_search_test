@@ -1,0 +1,7 @@
+dataset,build_profile,topology,shard_count,total_build_seconds,total_index_bytes,process_high_water_rss_kib
+sift10m,baseline,1x10m,1,1391.507,6605339232,9026516
+sift10m,baseline,2x5m,2,1254.999,6605341164,9026516
+sift10m,baseline,5x2m,5,1062.202,6605505944,9026516
+cohere10m,baseline,1x10m,1,5349.410,32205338552,45483736
+cohere10m,baseline,2x5m,2,5119.465,32205340892,46646176
+cohere10m,baseline,5x2m,5,4826.001,32205506012,46646176
